@@ -27,7 +27,7 @@ define('SPREADSHEET_EXCEL_READER_TYPE_NINETEENFOUR', 0x22);
 define('SPREADSHEET_EXCEL_READER_TYPE_MERGEDCELLS',  0xE5);
 define('SPREADSHEET_EXCEL_READER_UTCOFFSETDAYS' ,	25569);
 define('SPREADSHEET_EXCEL_READER_UTCOFFSETDAYS1904', 24107);
-class Spreadsheet_Excel_Reader {
+class SpreadsheetExcelReader {
 
     const BIFF8    = 0x600;
     const BIFF7    = 0x500;
@@ -123,9 +123,8 @@ class Spreadsheet_Excel_Reader {
         return $val;
     }
     function hyperlink($row,$col,$sheet=0) {
-        $link = $this->sheets[$sheet]['cellsInfo'][$row][$col]['hyperlink'];
-        if ($link) {
-            return $link['link'];
+        if (isset($this->sheets[$sheet]['cellsInfo'][$row][$col]['hyperlink'])) {
+            return $this->sheets[$sheet]['cellsInfo'][$row][$col]['hyperlink']['link'];
         }
         return '';
     }
@@ -366,7 +365,7 @@ class Spreadsheet_Excel_Reader {
                         }
                     }
                 }
-                if(!$this->sheets[$sheet]['cellsInfo'][$row][$col]['dontprint']) {
+                if(!isset($this->sheets[$sheet]['cellsInfo'][$row][$col]['dontprint'])) {
                     $style = $this->style($row,$col,$sheet);
                     if ($this->colhidden($col,$sheet)) {
                         $style .= "display:none;";
@@ -655,8 +654,8 @@ class Spreadsheet_Excel_Reader {
      *
      * Some basic initialisation
      */
-    function Spreadsheet_Excel_Reader($file='',$store_extended_info=true,$outputEncoding='') {
-        $this->_ole =& new OLERead();
+    public function __construct($file='',$store_extended_info=true,$outputEncoding='') {
+        $this->_ole = new OLERead();
         $this->setUTFEncoder('iconv');
         if ($outputEncoding != '') {
             $this->setOutputEncoding($outputEncoding);
